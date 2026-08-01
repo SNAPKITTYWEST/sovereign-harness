@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sovereign Harness — iPhone & iPad</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#04040a;--green:#00ff88;--amber:#ffd060;--dim:#555;--text:#e0e0f0;--mono:'SF Mono',Monaco,monospace}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);padding:24px;line-height:1.8}
+h1{color:var(--amber);font-size:16px;letter-spacing:2px;margin-bottom:8px}
+h2{color:var(--green);font-size:12px;letter-spacing:1px;margin:20px 0 8px}
+p,li{font-size:12px;color:var(--dim);line-height:1.8}
+li{margin-left:16px}
+code{background:#0a0a12;border:1px solid #1a1a28;border-radius:3px;padding:2px 8px;color:var(--green);font-size:11px}
+pre{background:#0a0a12;border:1px solid #1a1a28;border-radius:6px;padding:14px;margin:10px 0;overflow-x:auto;font-size:10px;color:var(--green);line-height:1.7}
+a{color:var(--amber)}
+.step{display:flex;gap:10px;margin:8px 0;align-items:flex-start}
+.num{color:var(--amber);min-width:20px}
+</style>
+</head>
+<body>
+<h1>⬡ SOVEREIGN HARNESS — iPhone & iPad</h1>
+<p>Full sovereign stack in your browser. No App Store. No download.</p>
+
+<h2>OPTION 1 — SAFARI PWA (INSTANT)</h2>
+<div class="step"><span class="num">1.</span><span>Open Safari and go to:<br><a href="https://snapkittywest.github.io/sovereign-harness/">snapkittywest.github.io/sovereign-harness</a></span></div>
+<div class="step"><span class="num">2.</span><span>Tap <strong style="color:var(--amber)">Share → Add to Home Screen</strong></span></div>
+<div class="step"><span class="num">3.</span><span>Opens as a PWA — works offline after first load</span></div>
+
+<h2>OPTION 2 — SWIFT PLAYGROUNDS (IPAD)</h2>
+<p>Open Swift Playgrounds and paste:</p>
+<pre>import SwiftUI
+import WebKit
+
+struct SovereignHarness: View {
+    var body: some View {
+        SovereignWebView().ignoresSafeArea()
+    }
+}
+
+struct SovereignWebView: UIViewRepresentable {
+    let url = URL(string:
+        "https://snapkittywest.github.io/sovereign-harness/")!
+    func makeUIView(context: Context) -> WKWebView {
+        let wv = WKWebView(frame: .zero)
+        wv.load(URLRequest(url: url))
+        return wv
+    }
+    func updateUIView(_ wv: WKWebView, context: Context) {}
+}
+
+import PlaygroundSupport
+PlaygroundPage.current.setLiveView(SovereignHarness())</pre>
+
+<h2>OPTION 3 — SHORTCUTS</h2>
+<div class="step"><span class="num">1.</span><span>Open the <strong style="color:var(--amber)">Shortcuts</strong> app</span></div>
+<div class="step"><span class="num">2.</span><span>New shortcut → <strong>Open URLs</strong></span></div>
+<div class="step"><span class="num">3.</span><span>URL: <code>https://snapkittywest.github.io/sovereign-harness/</code></span></div>
+<div class="step"><span class="num">4.</span><span>Add to home screen as <strong style="color:var(--green)">Sovereign</strong></span></div>
+
+<h2>WHAT RUNS IN SAFARI</h2>
+<ul>
+  <li>Plasma Gate — 7 principles, 8 prohibitions, ERE-5</li>
+  <li>Kneser-Ney language model (sovlm, zero GPU)</li>
+  <li>ANU QRNG — real quantum vacuum entropy</li>
+  <li>WORM SHA-256 chain (localStorage)</li>
+  <li>φ = 1.6180339887...</li>
+</ul>
+
+<p style="margin-top:24px;color:var(--amber)">Ω = TRUST ∧ CODE</p>
+</body>
+</html>
