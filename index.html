@@ -3,203 +3,498 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="theme-color" content="#00ff88"/>
-<title>Sovereign Harness — SnapKitty</title>
+<meta name="theme-color" content="#202123"/>
+<title>Sovereign Harness</title>
 <link rel="manifest" href="manifest.json"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#04040a;--bg1:#080810;--bg2:#0a0a12;
-  --border:#1a1a28;--text:#e0e0f0;--dim:#555;
-  --green:#00ff88;--amber:#ffd060;--cyan:#00e5ff;
-  --mag:#ff44ff;--red:#ff4444;
-  --mono:'SF Mono',Monaco,'Cascadia Mono',Consolas,monospace
+* {
+  box-sizing: border-box;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
 
-/* CRT scanline overlay */
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;
-  background:repeating-linear-gradient(to bottom,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px)}
+:root {
+  color-scheme: light;
+  --page: #ffffff;
+  --sidebar: #f7f7f8;
+  --surface: #ffffff;
+  --surface-muted: #f7f7f8;
+  --surface-hover: #ececf1;
+  --border: #e5e5e5;
+  --border-strong: #d1d1d1;
+  --text: #202123;
+  --text-soft: #565869;
+  --text-muted: #8e8ea0;
+  --primary: #202123;
+  --primary-hover: #343541;
+  --success: #217a48;
+  --warning: #9a6700;
+  --danger: #b42318;
+  --code: #f4f4f4;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --sidebar-width: 260px;
+  --content-width: 820px;
+  --font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
 
-/* Layout */
-.shell{display:grid;grid-template-rows:44px 1fr 32px;height:100vh}
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+}
 
-/* Top bar */
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:12px}
-.logo{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
-  letter-spacing:2px;color:var(--amber)}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.topbar-right{display:flex;align-items:center;gap:8px;font-size:10px}
-.badge{padding:2px 8px;border-radius:3px;border:1px solid;font-size:9px;letter-spacing:1px}
-.badge-green{color:var(--green);border-color:#00ff8833}
-.badge-amber{color:var(--amber);border-color:#ffd06033}
-.badge-dim{color:var(--dim);border-color:#33333355}
-.topbar-links a{color:var(--dim);font-size:10px;text-decoration:none;padding:0 6px}
-.topbar-links a:hover{color:var(--text)}
+body { overflow: hidden; }
 
-/* Main split */
-.main{display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+button, input { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
 
-/* Left — input / intent */
-.pane{display:flex;flex-direction:column;border-right:1px solid var(--border)}
-.pane-header{background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:8px 14px;font-size:9px;letter-spacing:2px;color:var(--amber);
-  display:flex;justify-content:space-between;align-items:center}
-.pane-body{flex:1;overflow-y:auto;padding:14px;font-size:11px;line-height:2}
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  grid-template-rows: 100vh;
+  min-height: 100vh;
+  background: var(--page);
+}
 
-/* Terminal output */
-.terminal{flex:1;overflow-y:auto;padding:14px;font-size:11px;line-height:1.9;
-  color:var(--amber)}
-.line-system{color:var(--green)}
-.line-pass{color:var(--green)}
-.line-fail{color:var(--red)}
-.line-warn{color:var(--amber)}
-.line-seal{color:var(--cyan);font-size:9px}
-.line-dim{color:var(--dim)}
-.line-phi{color:var(--mag)}
+.topbar {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 14px 12px;
+  overflow-y: auto;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
 
-/* Input row */
-.input-row{border-top:1px solid var(--border);display:flex;align-items:center;padding:8px 14px;gap:8px}
-.prompt-sym{color:var(--green);font-size:13px}
-.intent-input{flex:1;background:none;border:none;outline:none;color:var(--text);
-  font-family:var(--mono);font-size:12px}
-.intent-input::placeholder{color:var(--dim)}
-.run-btn{background:var(--amber);color:#000;border:none;padding:6px 16px;
-  border-radius:4px;font-family:var(--mono);font-size:11px;font-weight:700;
-  cursor:pointer;letter-spacing:1px}
-.run-btn:hover{background:#ffe090}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: 8px;
+}
 
-/* Status bar */
-.statusbar{background:var(--bg2);border-top:1px solid var(--border);
-  display:flex;align-items:center;padding:0 14px;gap:16px;font-size:9px;color:var(--dim)}
-.stat{display:flex;align-items:center;gap:4px}
-.stat-val{color:var(--text)}
-.stat-green{color:var(--green)}
-.stat-amber{color:var(--amber)}
+.logo-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--primary);
+  box-shadow: none;
+  animation: none;
+  flex-shrink: 0;
+}
 
-/* Install banner */
-.install-banner{background:var(--bg1);border:1px solid var(--border);
-  border-radius:6px;margin:14px;padding:12px 14px;font-size:10px}
-.install-title{color:var(--amber);font-size:9px;letter-spacing:2px;margin-bottom:8px}
-.install-cmd{background:var(--bg2);border:1px solid var(--border);border-radius:3px;
-  padding:6px 10px;margin:4px 0;color:var(--green);font-size:10px;
-  display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.install-cmd:hover{border-color:#00ff8855}
-.install-platform{color:var(--dim);font-size:9px}
-.copy-hint{color:var(--dim);font-size:8px}
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.new-chat-btn:hover { background: var(--surface-hover); }
 
-/* Pipeline trace */
-.stage{margin:4px 0;padding:4px 0}
-.stage-name{color:var(--cyan);font-size:9px;letter-spacing:1px}
-.stage-result{margin-left:12px}
+.sidebar-section-label {
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
 
-/* Phi display */
-.phi-display{text-align:center;padding:20px;color:var(--dim);font-size:10px;line-height:2}
-.phi-big{font-size:22px;color:var(--mag);letter-spacing:4px}
+.topbar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topbar-links a {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 14px;
+  text-decoration: none;
+}
+.topbar-links a:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.topbar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.badge-green, .badge-amber, .badge-dim { color: var(--text-muted); border-color: transparent; }
+
+.main {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--page);
+}
+
+.main > .pane:first-child { display: none; }
+
+.main > .pane:last-child {
+  position: relative;
+  display: grid;
+  grid-template-rows: 56px minmax(0, 1fr) auto;
+  width: 100%;
+  min-width: 0;
+  border: 0 !important;
+  background: var(--page);
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 24px;
+  background: rgba(255,255,255,0.94);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#trace-status, #plasma-status {
+  color: var(--text-muted) !important;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.terminal {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 28px 28px 170px;
+  overflow-y: auto;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.65;
+  scrollbar-gutter: stable;
+}
+
+.terminal > div {
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.line-system {
+  margin-top: 22px !important;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.line-pass  { color: var(--success); }
+.line-fail  { color: var(--danger); }
+.line-warn  { color: var(--warning); }
+
+.line-seal {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--code);
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.line-dim { color: var(--text-muted); }
+.line-phi { color: var(--text-soft); }
+
+.line-stage-name, .stage-name {
+  margin-top: 22px !important;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.stage { margin: 0; padding: 0; }
+.stage-result { margin-left: 0; }
+
+.input-row {
+  position: fixed;
+  z-index: 20;
+  right: 0;
+  bottom: 22px;
+  left: var(--sidebar-width);
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  width: min(calc(100% - var(--sidebar-width) - 48px), var(--content-width));
+  min-height: 58px;
+  margin: 0 auto;
+  padding: 10px 10px 10px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.01), 0 6px 24px rgba(0,0,0,0.08);
+}
+
+.prompt-sym { display: none; }
+
+.intent-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 2px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+}
+.intent-input::placeholder { color: var(--text-muted); }
+
+.run-btn {
+  flex: 0 0 auto;
+  min-width: 44px;
+  height: 40px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #ffffff;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.run-btn:hover { background: var(--primary-hover); }
+.run-btn:focus-visible,
+.intent-input:focus-visible,
+.topbar-links a:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.pane-body { font-family: var(--font); }
+.install-banner { margin: 0; padding: 0; border: 0; background: transparent; }
+.install-title { color: var(--text); font-size: 13px; letter-spacing: 0; }
+.install-cmd {
+  margin: 5px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 12px;
+}
+.install-cmd:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+.install-platform, .copy-hint, .phi-display { color: var(--text-muted); }
+.phi-big { color: var(--text); }
+
+.statusbar {
+  position: fixed;
+  z-index: 25;
+  left: 12px;
+  bottom: 12px;
+  display: none;
+  width: calc(var(--sidebar-width) - 24px);
+  padding: 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.stat { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.stat-val, .stat-green, .stat-amber { color: var(--text-soft); }
+
+@media (max-width: 800px) {
+  :root { --sidebar-width: 0px; }
+  body { overflow: hidden; }
+  .shell { display: block; }
+  .topbar { display: none; }
+  .main { width: 100%; height: 100vh; }
+  .pane-header { padding: 0 16px; }
+  .terminal { padding: 22px 18px 150px; }
+  .input-row { right: 12px; bottom: 12px; left: 12px; width: auto; }
+  .run-btn { min-width: 42px; padding: 0 12px; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page: #212121;
+    --sidebar: #171717;
+    --surface: #2f2f2f;
+    --surface-muted: #292929;
+    --surface-hover: #2a2a2a;
+    --border: #353535;
+    --border-strong: #4a4a4a;
+    --text: #ececec;
+    --text-soft: #c5c5c5;
+    --text-muted: #8f8f8f;
+    --primary: #ffffff;
+    --primary-hover: #e6e6e6;
+    --success: #76c893;
+    --warning: #e5b454;
+    --danger: #ff8a80;
+    --code: #2a2a2a;
+  }
+  .run-btn { color: #171717; }
+  .pane-header { background: rgba(33,33,33,0.94); }
+  .input-row {
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.02), 0 8px 28px rgba(0,0,0,0.35);
+  }
+}
 </style>
 </head>
 <body>
 <div class="shell">
 
-  <!-- Top bar -->
+  <!-- Sidebar -->
   <div class="topbar">
     <div class="logo">
       <div class="logo-dot"></div>
-      SOVEREIGN HARNESS
+      Sovereign Harness
     </div>
-    <div class="topbar-right">
-      <span class="badge badge-green" id="gate-badge">GATE READY</span>
-      <span class="badge badge-amber" id="llm-badge">WEBLLM</span>
-      <span class="badge badge-dim" id="worm-badge">WORM: GENESIS</span>
-    </div>
+
+    <a class="new-chat-btn" href="#" onclick="newChat();return false;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 3v10M3 8h10"/>
+      </svg>
+      New chat
+    </a>
+
+    <div class="sidebar-section-label">Install</div>
     <div class="topbar-links">
+      <a href="#" onclick="copyInstall('mac');return false;">Mac / Linux</a>
+      <a href="#" onclick="copyInstall('win');return false;">Windows</a>
+      <a href="install-ios.html" target="_blank">iPhone / iPad</a>
+    </div>
+
+    <div class="sidebar-section-label">Tools</div>
+    <div class="topbar-links">
+      <a href="https://snapkittywest.github.io/git-command-center/app.html" target="_blank">Git Command Center</a>
+      <a href="https://snapkittywest.github.io/dna-visualizer/" target="_blank">DNA Visualizer</a>
+      <a href="https://snapkittywest.github.io/cartographer-agent/" target="_blank">Cartographer</a>
       <a href="https://github.com/SNAPKITTYWEST/sovereign-harness" target="_blank">GitHub</a>
-      <a href="install-ios.html" target="_blank">iOS</a>
-      <a href="https://snapkittywest.github.io/git-command-center/" target="_blank">GitDOS</a>
-      <a href="https://snapkittywest.github.io/dna-visualizer/" target="_blank">DNA</a>
+    </div>
+
+    <div class="topbar-right">
+      <div class="badge badge-dim" id="gate-badge">Gate ready</div>
+      <div class="badge badge-amber" id="llm-badge">Checking model…</div>
+      <div class="badge badge-dim" id="worm-badge">WORM: genesis</div>
     </div>
   </div>
 
   <!-- Main -->
   <div class="main">
 
-    <!-- Left pane: input + install -->
+    <!-- Hidden left pane — IDs preserved for JS -->
     <div class="pane">
       <div class="pane-header">
-        <span>INTENT</span>
-        <span id="plasma-status" style="color:var(--green)">PLASMA GATE READY</span>
+        <span>Intent</span>
+        <span id="plasma-status">Plasma gate ready</span>
       </div>
-
       <div class="pane-body" id="install-section">
         <div class="install-banner">
-          <div class="install-title">BOOTSTRAP — ONE COMMAND</div>
+          <div class="install-title">Bootstrap</div>
           <div class="install-cmd" onclick="copyCmd(this)" data-cmd="curl -fsSL https://snapkittywest.github.io/sovereign-harness/install.sh | bash">
-            <span><span style="color:var(--dim)">Mac/Linux →</span> curl -fsSL ...install.sh | bash</span>
+            <span>Mac/Linux — curl -fsSL …install.sh | bash</span>
             <span class="copy-hint">click to copy</span>
           </div>
           <div class="install-cmd" onclick="copyCmd(this)" data-cmd="iwr -useb https://snapkittywest.github.io/sovereign-harness/install.ps1 | iex">
-            <span><span style="color:var(--dim)">Windows →</span> iwr -useb ...install.ps1 | iex</span>
+            <span>Windows — iwr -useb …install.ps1 | iex</span>
             <span class="copy-hint">click to copy</span>
           </div>
-          <div class="install-cmd" onclick="window.open('install-ios.html')" data-cmd="">
-            <span><span style="color:var(--dim)">iPhone/iPad →</span> Safari PWA or Swift Playgrounds</span>
-            <span class="copy-hint">tap to open</span>
-          </div>
-          <div style="margin-top:8px;color:var(--dim);font-size:9px;line-height:1.8">
-            After install: <span style="color:var(--green)">sk help</span> in terminal<br>
-            Plasma Gate · ERE-5 · WORM · WebLLM · ANU QRNG
-          </div>
         </div>
-
         <div class="phi-display">
           <div class="phi-big">φ</div>
-          <div>φ = (1+√5)/2 = 1.6180339887...</div>
-          <div>φ² = φ+1 · φ⁻¹+φ⁻² = 1</div>
-          <div style="color:var(--amber);margin-top:8px">TRS canonical = 388.985128</div>
-          <div style="margin-top:12px;color:var(--dim);font-size:9px">
-            7 governing principles · 8 prohibitions<br>
-            106 corpus families · ERE-5 gate<br>
-            ML-DSA-65 post-quantum WORM
-          </div>
+          φ = (1+√5)/2 = 1.6180339887
         </div>
-      </div>
-
-      <div class="input-row">
-        <span class="prompt-sym">⬡</span>
-        <input class="intent-input" id="intent" placeholder="Enter intent or command..." autocomplete="off" spellcheck="false"/>
-        <button class="run-btn" onclick="runIntent()">RUN</button>
       </div>
     </div>
 
-    <!-- Right pane: pipeline trace output -->
-    <div class="pane" style="border-right:none">
+    <!-- Conversation pane -->
+    <div class="pane">
       <div class="pane-header">
-        <span>PIPELINE TRACE</span>
-        <span id="trace-status" style="color:var(--dim)">IDLE</span>
+        <span>Sovereign Harness</span>
+        <span id="trace-status">Idle</span>
       </div>
-      <div class="terminal" id="terminal">
-        <!-- Boot sequence injected by JS -->
+
+      <div class="terminal" id="terminal"></div>
+
+      <div class="input-row">
+        <span class="prompt-sym">⬡</span>
+        <input class="intent-input" id="intent"
+               placeholder="Message Sovereign Harness"
+               autocomplete="off" spellcheck="false"/>
+        <button class="run-btn" onclick="runIntent()">Send</button>
       </div>
     </div>
 
   </div>
 
-  <!-- Status bar -->
+  <!-- Status bar (hidden, IDs preserved) -->
   <div class="statusbar">
-    <div class="stat">PLASMA <span class="stat-val stat-green" id="s-plasma">READY</span></div>
-    <div class="stat">ERE-5 <span class="stat-val stat-green" id="s-ere">READY</span></div>
-    <div class="stat">WORM <span class="stat-val stat-amber" id="s-worm">0 SEALS</span></div>
-    <div class="stat">LLM <span class="stat-val" id="s-llm" style="color:var(--dim)">CHECKING...</span></div>
-    <div class="stat">φ <span class="stat-val stat-green">1.6180339887</span></div>
-    <div class="stat" style="margin-left:auto">
-      <a href="https://snapkittywest.github.io/dna-visualizer/" style="color:var(--dim);text-decoration:none;font-size:9px">DNA VIZ</a>
-    </div>
-    <div class="stat">
-      <a href="https://snapkittywest.github.io/git-command-center/app.html" style="color:var(--dim);text-decoration:none;font-size:9px">GITDOS</a>
-    </div>
+    <div class="stat">Plasma <span class="stat-val stat-green" id="s-plasma">ready</span></div>
+    <div class="stat">ERE-5 <span class="stat-val stat-green" id="s-ere">ready</span></div>
+    <div class="stat">WORM <span class="stat-val stat-amber" id="s-worm">0 seals</span></div>
+    <div class="stat">LLM <span class="stat-val" id="s-llm">—</span></div>
   </div>
 
 </div>
@@ -209,57 +504,41 @@ import { plasma_gate, ere5 } from './src/plasma_gate.mjs'
 import { WormChain }         from './src/worm.mjs'
 import { getQuantumSamples, getSource } from './src/quantum.mjs'
 
-const PHI      = (1 + Math.sqrt(5)) / 2
-const TRS      = 388.985128
-const term     = document.getElementById('terminal')
-const worm     = new WormChain('sovereign-harness')
-let   sealCount = 0
+const PHI   = (1 + Math.sqrt(5)) / 2
+const term  = document.getElementById('terminal')
+const worm  = new WormChain('sovereign-harness')
+let sealCount = 0
 
 function print(text, cls = '') {
   const d = document.createElement('div')
-  d.className = cls ? `line-${cls}` : ''
+  if (cls) d.className = `line-${cls}`
   d.textContent = text
   term.appendChild(d)
   term.scrollTop = term.scrollHeight
 }
 
-function sep() { print('─'.repeat(52), 'dim') }
-
-// ── Boot sequence ─────────────────────────────────────────────────────────────
-const boot = [
-  ['APPLE GITDOS BY SNAPKITTY OS', 'system'],
-  ['SOVEREIGN HARNESS v1.0 · BOW-Ω-φ-∂-2026', 'system'],
-  ['COPYRIGHT SNAPKITTY COLLECTIVE · EIN 42-697643', 'dim'],
-  ['', ''],
-  ['PLASMA GATE:  7 PRINCIPLES · 8 PROHIBITIONS', 'pass'],
-  ['ERE-5 GATE:   STRUCTURAL · SCHOLARLY · INVARIANTS · MISSION · ROOT', 'pass'],
-  ['WORM CHAIN:   ML-DSA-65 POST-QUANTUM SEALED', 'pass'],
-  ['CORPUS:       106 FAMILIES REGISTERED', 'pass'],
-  ['', ''],
-  ['CHECKING LLM ENDPOINT...', 'dim'],
-]
-boot.forEach(([t, c]) => print(t, c))
+function sep() {
+  const d = document.createElement('div')
+  d.style.cssText = 'border-top:1px solid var(--border);margin:16px 0 8px'
+  term.appendChild(d)
+}
 
 // ── LLM detection ─────────────────────────────────────────────────────────────
 async function checkOllama() {
   try {
     const r = await fetch('http://127.0.0.1:11434/api/tags', { signal: AbortSignal.timeout(2000) })
     if (r.ok) {
-      const d = await r.json()
+      const d  = await r.json()
       const models = d.models?.map(m => m.name) || []
-      const best = models.find(m => m.includes('nemotron')) || models[0] || 'unknown'
-      print(`OLLAMA:       CONNECTED — ${best.toUpperCase()}`, 'pass')
-      document.getElementById('llm-badge').textContent = 'OLLAMA: ' + best.split(':')[0].toUpperCase()
-      document.getElementById('llm-badge').style.color = 'var(--green)'
-      document.getElementById('llm-badge').style.borderColor = '#00ff8833'
-      document.getElementById('s-llm').textContent = best.split(':')[0].toUpperCase()
-      document.getElementById('s-llm').style.color = 'var(--green)'
+      const best   = models.find(m => m.includes('nemotron')) || models[0] || 'unknown'
+      const label  = best.split(':')[0]
+      document.getElementById('llm-badge').textContent = label
+      document.getElementById('s-llm').textContent = label
       return best
     }
   } catch {}
-  print('OLLAMA:       NOT RUNNING — USING WEBLLM / SOVLM', 'warn')
-  document.getElementById('s-llm').textContent = 'WEBLLM/SOVLM'
-  document.getElementById('s-llm').style.color = 'var(--amber)'
+  document.getElementById('llm-badge').textContent = 'WebLLM / sovlm'
+  document.getElementById('s-llm').textContent = 'WebLLM'
   return null
 }
 
@@ -268,123 +547,131 @@ async function bootQRNG() {
   try {
     const samples = await getQuantumSamples(4)
     const source  = getSource()
-    print(`ANU QRNG:     ${source} — ${samples.length} SAMPLES`, source === 'ANU_QRNG' ? 'pass' : 'warn')
-  } catch { print('ANU QRNG:     CSPRNG FALLBACK', 'warn') }
+    return source
+  } catch { return 'CSPRNG' }
 }
 
 // ── WORM boot seal ────────────────────────────────────────────────────────────
 async function bootSeal() {
-  const seal = await worm.seal('BOOT', { ts: Date.now(), version: '1.0', phi: PHI })
+  const seal = await worm.seal('BOOT', { ts: Date.now(), phi: PHI })
   sealCount++
-  document.getElementById('s-worm').textContent = sealCount + ' SEALS'
-  document.getElementById('worm-badge').textContent = 'WORM: ' + seal.slice(0, 12) + '...'
-  print(`WORM SEAL:    ${seal.slice(0,32)}...`, 'seal')
-  sep()
-  print('SOVEREIGN HARNESS READY.', 'system')
-  print('TYPE INTENT OR COMMAND BELOW.', 'dim')
-  document.getElementById('trace-status').textContent = 'READY'
-  document.getElementById('trace-status').style.color = 'var(--green)'
+  document.getElementById('s-worm').textContent = sealCount + ' seals'
+  document.getElementById('worm-badge').textContent = 'WORM: ' + seal.slice(0,12) + '…'
+  return seal
 }
 
+// ── Boot ──────────────────────────────────────────────────────────────────────
 ;(async () => {
-  await checkOllama()
-  await bootQRNG()
-  await bootSeal()
+  const model  = await checkOllama()
+  const source = await bootQRNG()
+  const seal   = await bootSeal()
+
+  print('Sovereign Harness ready', 'system')
+  print('')
+  print('Plasma Gate · 7 principles · 8 prohibitions · ERE-5', 'dim')
+  print('Entropy: ' + source, 'dim')
+  print('Model: ' + (model || 'WebLLM / sovlm'), 'dim')
+  print('WORM: ' + seal.slice(0,32) + '…', 'seal')
+  print('')
+  print('Type a message and press Enter or Send.', 'dim')
+  document.getElementById('trace-status').textContent = 'Ready'
 })()
 
-// ── Run intent through pipeline ───────────────────────────────────────────────
+// ── Run intent ────────────────────────────────────────────────────────────────
 window.runIntent = async function() {
   const intent = document.getElementById('intent').value.trim()
   if (!intent) return
   document.getElementById('intent').value = ''
-  document.getElementById('trace-status').textContent = 'RUNNING'
-  document.getElementById('trace-status').style.color = 'var(--amber)'
+  document.getElementById('trace-status').textContent = 'Running…'
 
   sep()
-  print(`] ${intent}`, '')
-  sep()
+  print(intent, 'system')
 
   // Stage 1: Plasma Gate
-  print('STAGE 1 · PLASMA GATE', 'stage-name')
+  print('Plasma Gate', 'stage-name')
   const pg = plasma_gate(intent)
   if (pg.pass) {
-    print(`  ✓ ${pg.message}`, 'pass')
+    print('  ✓ ' + pg.message, 'pass')
   } else {
-    print(`  ✗ BLOCKED: ${pg.reason}`, 'fail')
-    print(`  PRINCIPLE: ${pg.principle}`, 'warn')
+    print('  ✗ Blocked: ' + pg.reason, 'fail')
+    print('  Principle: ' + pg.principle, 'warn')
     const seal = await worm.seal('PLASMA_REJECT', { intent, reason: pg.reason })
     sealCount++
-    document.getElementById('s-worm').textContent = sealCount + ' SEALS'
-    print(`  SEALED: ${seal.slice(0,24)}...`, 'seal')
-    document.getElementById('trace-status').textContent = 'REJECTED'
-    document.getElementById('trace-status').style.color = 'var(--red)'
+    document.getElementById('s-worm').textContent = sealCount + ' seals'
+    print('  Sealed: ' + seal.slice(0,32) + '…', 'seal')
+    document.getElementById('trace-status').textContent = 'Rejected'
     return
   }
 
   // Stage 2: ERE-5
-  print('STAGE 2 · ERE-5', 'stage-name')
+  print('ERE-5', 'stage-name')
   const ere = ere5(intent)
-  ere.passes.forEach(p => print(`  [${p.pass ? '✓' : '✗'}] ${p.name}: ${p.result}`, p.pass ? 'pass' : 'fail'))
+  ere.passes.forEach(p => print('  [' + (p.pass ? '✓' : '✗') + '] ' + p.name + ': ' + p.result, p.pass ? 'pass' : 'fail'))
   if (!ere.overall) {
-    print(`  ✗ ERE-5 FAILED: ${ere.failed}`, 'fail')
-    document.getElementById('trace-status').textContent = 'ERE FAIL'
-    document.getElementById('trace-status').style.color = 'var(--red)'
+    print('  ✗ ERE-5 failed: ' + ere.failed, 'fail')
+    document.getElementById('trace-status').textContent = 'ERE fail'
     return
   }
 
-  // Stage 3: Corpus gate + generation
-  print('STAGE 3 · GENERATION', 'stage-name')
-  const ollamaModel = document.getElementById('llm-badge').textContent
-  if (ollamaModel.startsWith('OLLAMA')) {
-    print(`  → Calling Ollama (${ollamaModel})...`, 'dim')
+  // Stage 3: Generation
+  print('Generation', 'stage-name')
+  const llmLabel = document.getElementById('llm-badge').textContent
+  if (llmLabel !== 'WebLLM / sovlm') {
     try {
       const r = await fetch('http://127.0.0.1:11434/api/generate', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ model: ollamaModel.replace('OLLAMA: ','').toLowerCase(), prompt: intent, stream: false }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: llmLabel.toLowerCase(), prompt: intent, stream: false }),
         signal: AbortSignal.timeout(30000)
       })
       const d = await r.json()
-      const resp = d.response || ''
-      resp.split('\n').slice(0, 8).forEach(l => print('  ' + l, ''))
-    } catch (e) { print('  Ollama timeout — falling back to sovlm', 'warn') }
+      ;(d.response || '').split('\n').slice(0, 12).forEach(l => print('  ' + l, ''))
+    } catch { print('  Ollama timeout — install sk CLI for full output', 'warn') }
   } else {
-    print('  → sovlm Kneser-Ney (browser, zero GPU)', 'dim')
-    print('  [generation requires sk CLI or Ollama for full output]', 'dim')
-    print('  Install: curl -fsSL .../install.sh | bash', 'dim')
+    print('  Install sk CLI or start Ollama for model responses.', 'dim')
+    print('  curl -fsSL https://snapkittywest.github.io/sovereign-harness/install.sh | bash', 'dim')
   }
 
-  // Stage 4: WORM seal
-  print('STAGE 4 · WORM SEAL', 'stage-name')
+  // Stage 4: WORM
+  print('WORM seal', 'stage-name')
   const samples = await getQuantumSamples(4)
-  const seal = await worm.seal('INTENT_ACCEPTED', {
-    intent, plasma: pg.message, ere: ere.overall,
-    quantum_seed: samples.slice(0,2), ts: Date.now()
-  })
+  const seal    = await worm.seal('ACCEPTED', { intent, ts: Date.now(), quantum: samples.slice(0,2) })
   sealCount++
-  document.getElementById('s-worm').textContent = sealCount + ' SEALS'
-  document.getElementById('worm-badge').textContent = 'WORM: ' + seal.slice(0,12) + '...'
-  print(`  SEALED: ${seal.slice(0,32)}...`, 'seal')
+  document.getElementById('s-worm').textContent = sealCount + ' seals'
+  document.getElementById('worm-badge').textContent = 'WORM: ' + seal.slice(0,12) + '…'
+  print('  ' + seal.slice(0,48) + '…', 'seal')
 
-  sep()
-  print('ACCEPTED · Ω = TRUST ∧ CODE', 'pass')
-  document.getElementById('trace-status').textContent = 'ACCEPTED'
-  document.getElementById('trace-status').style.color = 'var(--green)'
+  document.getElementById('trace-status').textContent = 'Accepted'
 }
 
-// ── Copy install command ──────────────────────────────────────────────────────
+// ── New chat ──────────────────────────────────────────────────────────────────
+window.newChat = function() {
+  term.innerHTML = ''
+  document.getElementById('trace-status').textContent = 'Idle'
+  print('New conversation started.', 'dim')
+}
+
+// ── Copy install ──────────────────────────────────────────────────────────────
+window.copyInstall = function(platform) {
+  const cmds = {
+    mac: 'curl -fsSL https://snapkittywest.github.io/sovereign-harness/install.sh | bash',
+    win: 'iwr -useb https://snapkittywest.github.io/sovereign-harness/install.ps1 | iex'
+  }
+  navigator.clipboard.writeText(cmds[platform] || '').catch(() => {})
+}
+
 window.copyCmd = function(el) {
   const cmd = el.dataset.cmd
   if (!cmd) return
   navigator.clipboard.writeText(cmd).then(() => {
     const hint = el.querySelector('.copy-hint')
-    if (hint) { hint.textContent = 'copied!'; setTimeout(() => hint.textContent = 'click to copy', 2000) }
-  })
+    if (hint) { hint.textContent = 'Copied'; setTimeout(() => hint.textContent = 'click to copy', 2000) }
+  }).catch(() => {})
 }
 
 // Enter key
 document.getElementById('intent').addEventListener('keydown', e => {
-  if (e.key === 'Enter') window.runIntent()
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.runIntent() }
 })
 </script>
 </body>
