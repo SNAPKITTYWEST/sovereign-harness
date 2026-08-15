@@ -5,6 +5,25 @@
 
 set -e
 
+# ── Sovereign Node Key Gate ───────────────────────────────────────────────────
+if [ -z "${SNAPKITTY_NODE_KEY}" ]; then
+  echo ""
+  echo "  ╔══════════════════════════════════════════════════╗"
+  echo "  ║     SOVEREIGN NODE KEY REQUIRED                  ║"
+  echo "  ║                                                  ║"
+  echo "  ║  Set SNAPKITTY_NODE_KEY before running.         ║"
+  echo "  ║                                                  ║"
+  echo "  ║  Get your key:                                   ║"
+  echo "  ║  licensing@snapkittywest.dev                     ║"
+  echo "  ║  https://github.com/SNAPKITTYWEST               ║"
+  echo "  ║                                                  ║"
+  echo "  ║  Copyright (C) 2026 Bel Esprit D'Accord         ║"
+  echo "  ║  Irrevocable Trust (EIN 42-697643)               ║"
+  echo "  ╚══════════════════════════════════════════════════╝"
+  echo ""
+  exit 1
+fi
+
 # ── Colors ────────────────────────────────────────────────────────────────────
 GRN='\033[0;32m'; YLW='\033[0;33m'; CYN='\033[0;36m'
 MAG='\033[0;35m'; RED='\033[0;31m'; DIM='\033[2m'; NC='\033[0m'; BOLD='\033[1m'
